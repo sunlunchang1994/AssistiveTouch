@@ -71,7 +71,7 @@ class ActionManager extends XC_MethodHook {
             return new HwKeyAction(this.actionId, this.customApp);
         }
     }
-
+    @SuppressWarnings("unchecked")
     private ActionManager() {
         this.isLoadPreferences = false;
         this.mIsOpenMainWitch = false;
@@ -106,6 +106,10 @@ class ActionManager extends XC_MethodHook {
         return Holder.INSTANCE;
     }
 
+    /**
+     * 初始化广播接收者
+     * @param context
+     */
     final void initActionReceiver(Context context) {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Ga.ACTION_REQUEST_SYSTEM_INFO);
@@ -116,7 +120,7 @@ class ActionManager extends XC_MethodHook {
         intentFilter.addAction(Ga.ACTION_PREF_KEY_HWKEY_SWITCH);
         context.registerReceiver(this.mBroadcastReceiver, intentFilter);
     }
-
+    @Override
     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
         super.afterHookedMethod(param);
         if (!this.isLoadPreferences && param.args[1] != null) {
@@ -319,12 +323,15 @@ class ActionManager extends XC_MethodHook {
         }
     }
 
+    /**
+     * 初始化Preferences
+     * 此处要做双重判断 因为系统发送的消息过于频繁 初始化RemotePreferences过于耗时
+     */
     void initPreferences() {
         if (!this.isLoadPreferences) {
             Map<String, ?> allData = new RemotePreferences(MethodHookPm.getInstance().getContext(), SettingConstant.AUTHORITIES, SettingConstant.APP_PREFERENCES_NAME).getAll();
             XpLog.log("initPreferences", allData.size() + "*", true);
-            if (!this.isLoadPreferences && allData.size() != 0) {
-                this.isLoadPreferences = true;
+            if (!this.isLoadPreferences ) {
                 fillPreferences(allData);
             }
         }
@@ -396,6 +403,7 @@ class ActionManager extends XC_MethodHook {
     }
 
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             String key = intent.getStringExtra(Ga.EXTRA_KEY);
@@ -439,39 +447,39 @@ class ActionManager extends XC_MethodHook {
                     ActionManager.this.setActionFor(HwKeyTrigger.CUSTOM_DOUBLETAP, value);
                 }
             } else if (SettingConstant.Ga.ACTION_PREF_HWKEY_CHANGED_CUSTOM.equals(action)) {
-                String value2 = intent.getStringExtra(Ga.EXTRA_VALUE);
+                String value = intent.getStringExtra(Ga.EXTRA_VALUE);
                 if (SettingConstant.PREF_KEY_HWKEY_BIXBY_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.BIXBY_SINGLETAP, value2);
+                    ActionManager.this.setActionFor(HwKeyTrigger.BIXBY_SINGLETAP, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_BIXBY_LONG_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.BIXBY_LONGPRESS, value2);
+                    ActionManager.this.setActionFor(HwKeyTrigger.BIXBY_LONGPRESS, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_BIXBY_DOUBLE_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.BIXBY_DOUBLETAP, value2);
+                    ActionManager.this.setActionFor(HwKeyTrigger.BIXBY_DOUBLETAP, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_HOME_LONG_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.HOME_LONGPRESS, value2);
+                    ActionManager.this.setActionFor(HwKeyTrigger.HOME_LONGPRESS, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_BACK_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.BACK_SINGLETAP, value2);
+                    ActionManager.this.setActionFor(HwKeyTrigger.BACK_SINGLETAP, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_BACK_LONG_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.BACK_LONGPRESS, value2);
+                    ActionManager.this.setActionFor(HwKeyTrigger.BACK_LONGPRESS, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_BACK_DOUBLE_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.BACK_DOUBLETAP, value2);
+                    ActionManager.this.setActionFor(HwKeyTrigger.BACK_DOUBLETAP, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_MENU_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.MENU_SINGLETAP, value2);
+                    ActionManager.this.setActionFor(HwKeyTrigger.MENU_SINGLETAP, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_MENU_LONG_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.MENU_LONGPRESS, value2);
+                    ActionManager.this.setActionFor(HwKeyTrigger.MENU_LONGPRESS, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_MENU_DOUBLE_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.MENU_DOUBLETAP, value2);
+                    ActionManager.this.setActionFor(HwKeyTrigger.MENU_DOUBLETAP, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_APP_SWITCH_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.APP_SWITCH_SINGLETAP, value2);
+                    ActionManager.this.setActionFor(HwKeyTrigger.APP_SWITCH_SINGLETAP, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_APP_SWITCH_LONG_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.APP_SWITCH_LONGPRESS, value2);
+                    ActionManager.this.setActionFor(HwKeyTrigger.APP_SWITCH_LONGPRESS, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_APP_SWITCH_DOUBLE_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.APP_SWITCH_DOUBLETAP, value2);
+                    ActionManager.this.setActionFor(HwKeyTrigger.APP_SWITCH_DOUBLETAP, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_CUSTOM_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.CUSTOM_SINGLETAP, value2);
+                    ActionManager.this.setActionFor(HwKeyTrigger.CUSTOM_SINGLETAP, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_CUSTOM_LONG_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.CUSTOM_LONGPRESS, value2);
+                    ActionManager.this.setActionFor(HwKeyTrigger.CUSTOM_LONGPRESS, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_CUSTOM_DOUBLE_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.CUSTOM_DOUBLETAP, value2);
+                    ActionManager.this.setActionFor(HwKeyTrigger.CUSTOM_DOUBLETAP, value);
                 }
             } else if (SettingConstant.Ga.ACTION_PREF_HWKEY_DOUBLETAP_SPEED_CHANGED.equals(action)) {
                 ActionManager.this.mDoubletapSpeed = intent.getIntExtra(Ga.EXTRA_VALUE, ActionManager.this.mDoubletapSpeed);
@@ -487,6 +495,7 @@ class ActionManager extends XC_MethodHook {
         }
     };
     private Runnable killCurrentApplicationRunnable = new Runnable() {
+        @Override
         public void run() {
             try {
                 Intent intent = new Intent("android.intent.action.MAIN");
@@ -525,13 +534,14 @@ class ActionManager extends XC_MethodHook {
     };
     private Runnable switchToLastAppRunnable = new Runnable() {
         @SuppressLint({"MissingPermission"})
+        @Override
         public void run() {
             int lastAppId = 0;
             int looper = 1;
-            Intent intent = new Intent("android.intent.action.MAIN");
+            Intent intent = new Intent(Intent.ACTION_MAIN);
             ActivityManager am = ActionManager.this.getActivityManager();
             String defaultHomePackage = HookConstant.PACK_DEF_LAUNCHER;
-            intent.addCategory("android.intent.category.HOME");
+            intent.addCategory(Intent.CATEGORY_HOME);
             ResolveInfo res = MethodHookPm.getInstance().getContext().getPackageManager().resolveActivity(intent, 0);
             if (!(res.activityInfo == null || res.activityInfo.packageName.equals(HookConstant.PACK_ANDROID))) {
                 defaultHomePackage = res.activityInfo.packageName;

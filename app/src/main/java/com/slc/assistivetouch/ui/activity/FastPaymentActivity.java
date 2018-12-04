@@ -11,12 +11,6 @@ import com.slc.assistivetouch.model.payment.PaymentConstant;
 import com.slc.code.ui.activity.BaseActivity;
 
 public class FastPaymentActivity extends BaseActivity implements OnClickListener {
-    private LinearLayout alipay_collect_money_code;
-    private LinearLayout alipay_payment_code;
-    private LinearLayout alipay_scan;
-    private LinearLayout wx_collect_money_code;
-    private LinearLayout wx_payment_code;
-    private LinearLayout wx_scan;
 
     public Object setLayout() {
         return R.layout.activity_fast_payment;
@@ -24,18 +18,18 @@ public class FastPaymentActivity extends BaseActivity implements OnClickListener
 
     public void onBindView(@Nullable Bundle savedInstanceState) {
         setShowStatusBarEmbellishView(false);
-        this.wx_scan = findViewById(R.id.wx_scan);
-        this.wx_scan.setOnClickListener(this);
-        this.wx_payment_code = findViewById(R.id.wx_payment_code);
-        this.wx_payment_code.setOnClickListener(this);
-        this.wx_collect_money_code = findViewById(R.id.wx_collect_money_code);
-        this.wx_collect_money_code.setOnClickListener(this);
-        this.alipay_scan = findViewById(R.id.alipay_scan);
-        this.alipay_scan.setOnClickListener(this);
-        this.alipay_payment_code = findViewById(R.id.alipay_payment_code);
-        this.alipay_payment_code.setOnClickListener(this);
-        this.alipay_collect_money_code = findViewById(R.id.alipay_collect_money_code);
-        this.alipay_collect_money_code.setOnClickListener(this);
+        LinearLayout wx_scan = findViewById(R.id.wx_scan);
+        wx_scan.setOnClickListener(this);
+        LinearLayout wx_payment_code = findViewById(R.id.wx_payment_code);
+        wx_payment_code.setOnClickListener(this);
+        LinearLayout wx_collect_money_code = findViewById(R.id.wx_collect_money_code);
+        wx_collect_money_code.setOnClickListener(this);
+        LinearLayout alipay_scan = findViewById(R.id.alipay_scan);
+        alipay_scan.setOnClickListener(this);
+        LinearLayout alipay_payment_code = findViewById(R.id.alipay_payment_code);
+        alipay_payment_code.setOnClickListener(this);
+        LinearLayout alipay_collect_money_code = findViewById(R.id.alipay_collect_money_code);
+        alipay_collect_money_code.setOnClickListener(this);
     }
 
     public void onClick(View v) {

@@ -46,6 +46,7 @@ public class MainSettingPresenterImp extends MvpPresenterImp<MainSettingContract
 
     @Override
     public void init(Bundle bundle) {
+        this.preference_key_activities = getContext().getResources().getStringArray(R.array.preference_key_activities);
         this.isOxygenOsRomOrH2OsRom = bundle.getBoolean(SettingConstant.Ga.KEY_IS_OXYGEN_OS_ROM_OR_H2OS_ROM);
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M || this.isOxygenOsRomOrH2OsRom) {
             this.sharedPreferences = getContext().getSharedPreferences(SettingConstant.APP_PREFERENCES_NAME, Context.MODE_PRIVATE);
@@ -53,14 +54,13 @@ public class MainSettingPresenterImp extends MvpPresenterImp<MainSettingContract
             this.sharedPreferences = new WorldReadablePreferences(!getContext().isDeviceProtectedStorage() ?
                     getContext().createDeviceProtectedStorageContext() : getContext(), SettingConstant.APP_PREFERENCES_NAME);
         }
-        this.preference_key_activities = getContext().getResources().getStringArray(R.array.preference_key_activities);
     }
 
     @Override
     public String getCustomSummary(String key) {
         return this.sharedPreferences.getString(key + SettingConstant.KEY_HWKEY_CUSTOM_NAME, getContext().getString(R.string.title_custom_actions));
     }
-
+    @SuppressWarnings("all")
     @Override
     public void clearCustomAction(String key) {
         this.sharedPreferences.edit().remove(key + SettingConstant.KEY_HWKEY_CUSTOM).remove(key + SettingConstant.KEY_HWKEY_CUSTOM_NAME).commit();
