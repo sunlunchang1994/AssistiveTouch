@@ -1,6 +1,7 @@
 package com.slc.assistivetouch.contract;
 
 import android.os.Bundle;
+import android.preference.PreferenceFragment;
 
 import com.slc.assistivetouch.model.load_app.po.PackInfoItem;
 import com.slc.code.contract.MvpContract.BaseModel;
@@ -41,5 +42,6 @@ public interface MainSettingContract {
 
     interface MainSettingView extends BaseMvpView<MainSettingPresenter> {
         void refreshCustomItem(String str, String str2);
+        PreferenceFragment getPreferenceFragment();
     }
 }

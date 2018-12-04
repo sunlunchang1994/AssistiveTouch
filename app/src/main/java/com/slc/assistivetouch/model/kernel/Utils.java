@@ -27,7 +27,7 @@ public class Utils {
     static boolean isH2OsRom() {
         if (mIsH2OsRom == null) {
             String version = SystemProp.get("ro.rom.version", "0");
-            mIsH2OsRom = version != null && !version.isEmpty() && !version.contains("H2OS");
+            mIsH2OsRom = version != null && !version.isEmpty() && version.contains("H2OS");
         }
         return mIsH2OsRom;
     }

@@ -6,7 +6,9 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.slc.assistivetouch.R;
@@ -32,7 +34,7 @@ public class MainSettingFragment extends PreferenceBaseFragment<MainSettingPrese
         private ListPreference preference_action_menu_double;
         private ListPreference preference_action_menu_long;*/
     private boolean isAllowOpen;
-    private SwitchPreference preference_action_switch_app_switch_and_back;
+    //private SwitchPreference preference_action_switch_app_switch_and_back;
     private ListPreference preference_custom_actions_temp;
     private SwitchPreference preference_main_switch;
 
@@ -54,8 +56,8 @@ public class MainSettingFragment extends PreferenceBaseFragment<MainSettingPrese
     public void fromResourceLater() {
         this.preference_main_switch = (SwitchPreference) findPreference(SettingConstant.PREF_KEY_HWKEY_MAIN_SWITCH);
         this.preference_main_switch.setOnPreferenceChangeListener(this);
-        this.preference_action_switch_app_switch_and_back = (SwitchPreference) findPreference(SettingConstant.PREF_KEY_HWKEY_SWITCH_APP_SWITCH_AND_BACK);
-        this.preference_action_switch_app_switch_and_back.setOnPreferenceChangeListener(this);
+        /*this.preference_action_switch_app_switch_and_back = (SwitchPreference) findPreference(SettingConstant.PREF_KEY_HWKEY_SWITCH_APP_SWITCH_AND_BACK);
+        this.preference_action_switch_app_switch_and_back.setOnPreferenceChangeListener(this);*/
 /*        this.preference_action_bixby = findListPreferenceAndInitBaseConfig(SettingConstant.PREF_KEY_HWKEY_BIXBY);
         this.preference_action_bixby_long = findListPreferenceAndInitBaseConfig(SettingConstant.PREF_KEY_HWKEY_BIXBY_LONG);
         this.preference_action_bixby_double = findListPreferenceAndInitBaseConfig(SettingConstant.PREF_KEY_HWKEY_BIXBY_DOUBLE);
@@ -99,6 +101,7 @@ public class MainSettingFragment extends PreferenceBaseFragment<MainSettingPrese
      * @param key
      * @return ListPreference
      */
+    @SuppressWarnings("all")
     private ListPreference findListPreferenceAndInitBaseConfig(CharSequence key) {
         ListPreference listPreference = (ListPreference) findPreference(key);
         setListPreferenceSummary(listPreference);
@@ -111,16 +114,16 @@ public class MainSettingFragment extends PreferenceBaseFragment<MainSettingPrese
         String key = preference.getKey();
         if (SettingConstant.PREF_KEY_HWKEY_MAIN_SWITCH.equals(key)) {
             if (this.isAllowOpen) {
-                String str = SettingConstant.Ga.ACTION_PREF_KEY_HWKEY_SWITCH;
-                getPresenter().sendBroadcastFromPreferenceChange(str, key, this.preference_main_switch.isChecked());
+                getPresenter().sendBroadcastFromPreferenceChange(SettingConstant.Ga.ACTION_PREF_KEY_HWKEY_SWITCH, key, newValue);
             } else {
-                Toast.makeText(getMvpContext(), R.string.label_main_switch_summary, Toast.LENGTH_LONG).show();
+                Toast.makeText(getMvpContext(), R.string.label_main_switch_summary, Toast.LENGTH_SHORT).show();
             }
             return this.isAllowOpen;
         }
-        if (SettingConstant.PREF_KEY_HWKEY_SWITCH_APP_SWITCH_AND_BACK.equals(key)) {
+        /*if (SettingConstant.PREF_KEY_HWKEY_SWITCH_APP_SWITCH_AND_BACK.equals(key)) {
             getPresenter().sendBroadcastFromPreferenceChange(SettingConstant.Ga.ACTION_PREF_KEY_HWKEY_SWITCH, key, this.preference_action_switch_app_switch_and_back.isChecked());
-        } else if (Integer.parseInt(newValue.toString()) == SettingConstant.HWKEY_ACTION_CUSTOM_ACTIONS) {
+        } else */
+        if (Integer.parseInt(newValue.toString()) == SettingConstant.HWKEY_ACTION_CUSTOM_ACTIONS) {
             this.preference_custom_actions_temp = (ListPreference) preference;
             getPresenter().showLoadingAppDialog(preference.getKey());
             return false;
@@ -134,6 +137,11 @@ public class MainSettingFragment extends PreferenceBaseFragment<MainSettingPrese
     public void refreshCustomItem(String summary, String value) {
         this.preference_custom_actions_temp.setSummary(summary);
         this.preference_custom_actions_temp.setValue(value);
+    }
+
+    @Override
+    public PreferenceFragment getPreferenceFragment() {
+        return this;
     }
 
     @Override

@@ -32,10 +32,10 @@
         <ListPreference n6:entries="@array/preference_key_activities" n6:title="@string/title_press_the_operation_long" n6:key="@string/pref_key_hwkey_menu_long" n6:dependency="@string/pref_key_hwkey_main_switch" n6:defaultValue="0" n6:entryValues="@array/preference_key_activities_index" />
         <ListPreference n6:entries="@array/preference_key_activities" n6:title="@string/title_press_the_operation_double" n6:key="@string/pref_key_hwkey_menu_double" n6:dependency="@string/pref_key_hwkey_main_switch" n6:defaultValue="0" n6:entryValues="@array/preference_key_activities_index" />
     </PreferenceCategory>
-    <PreferenceCategory n7:title="@string/title_other"
+    <!--<PreferenceCategory n7:title="@string/title_other"
       xmlns:n7="http://schemas.android.com/apk/res/android">
         <SwitchPreference n7:title="@string/title_switch_button" n7:key="@string/pref_key_hwkey_switch_app_switch_and_back" n7:summary="@string/title_switch_app_switch_and_back" n7:dependency="@string/pref_key_hwkey_main_switch" />
-    </PreferenceCategory>
+    </PreferenceCategory>-->
     <PreferenceCategory n8:title="@string/title_about"
       xmlns:n8="http://schemas.android.com/apk/res/android">
         <Preference n8:title="@string/title_donate" n8:key="@string/pref_key_donate" n8:summary="@string/label_donate_summary" />

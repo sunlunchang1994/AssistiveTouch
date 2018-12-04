@@ -51,6 +51,7 @@ public class MainSettingPresenterImp extends MvpPresenterImp<MainSettingContract
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M || this.isOxygenOsRomOrH2OsRom) {
             this.sharedPreferences = getContext().getSharedPreferences(SettingConstant.APP_PREFERENCES_NAME, Context.MODE_PRIVATE);
         } else {
+            getView().getPreferenceFragment().getPreferenceManager().setStorageDeviceProtected();
             this.sharedPreferences = new WorldReadablePreferences(!getContext().isDeviceProtectedStorage() ?
                     getContext().createDeviceProtectedStorageContext() : getContext(), SettingConstant.APP_PREFERENCES_NAME);
         }
@@ -60,6 +61,7 @@ public class MainSettingPresenterImp extends MvpPresenterImp<MainSettingContract
     public String getCustomSummary(String key) {
         return this.sharedPreferences.getString(key + SettingConstant.KEY_HWKEY_CUSTOM_NAME, getContext().getString(R.string.title_custom_actions));
     }
+
     @SuppressWarnings("all")
     @Override
     public void clearCustomAction(String key) {
@@ -106,6 +108,7 @@ public class MainSettingPresenterImp extends MvpPresenterImp<MainSettingContract
         });
         lv_app_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
+            @SuppressWarnings("all")
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 PackInfoItem packInfoItem = (PackInfoItem) parent.getItemAtPosition(position);
                 Log.i("packInfoItem", packInfoItem.getValue());

@@ -52,6 +52,7 @@ public class MethodHookInterceptKeyBefore {
     static MethodHookInterceptKeyBefore getInstance() {
         return Holder.INSTANCE;
     }
+
     private XC_MethodHook interceptKeyBeforeDispatchingMethodHook = new XC_MethodHook() {
         @Override
         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -307,11 +308,11 @@ public class MethodHookInterceptKeyBefore {
                             param.setResult(0);
                             return;
                         }
-                        if (event.getRepeatCount() == 0 && (event.getFlags() & KeyEvent.FLAG_FROM_SYSTEM) != 0) {
+                        /*if (event.getRepeatCount() == 0 && (event.getFlags() & KeyEvent.FLAG_FROM_SYSTEM) != 0) {
                             XpLog.log("HOME KeyEvent coming from HW key and keys disabled. Ignoring.");
                             param.setResult(0);
                             return;
-                        }
+                        }*/
                     } else {
                         if (event.getRepeatCount() == 0) {
                             mIsHomeLongPressed = false;

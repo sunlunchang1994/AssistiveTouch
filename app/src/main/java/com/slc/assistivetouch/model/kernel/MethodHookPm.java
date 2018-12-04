@@ -1,6 +1,7 @@
 package com.slc.assistivetouch.model.kernel;
 
 import android.content.Context;
+
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodHook.MethodHookParam;
 import de.robv.android.xposed.XposedBridge;
@@ -13,6 +14,7 @@ public class MethodHookPm extends XC_MethodHook {
     private static class Holder {
         private static final MethodHookPm INSTANCE = new MethodHookPm();
     }
+
     static MethodHookPm getInstance() {
         return Holder.INSTANCE;
     }
@@ -24,6 +26,7 @@ public class MethodHookPm extends XC_MethodHook {
     Object getPhoneWindowManager() {
         return this.mPhoneWindowManager;
     }
+
     @Override
     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
         this.mPhoneWindowManager = param.thisObject;

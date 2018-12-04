@@ -14,6 +14,7 @@ import android.content.pm.ResolveInfo;
 import android.hardware.input.InputManager;
 import android.os.Build;
 import android.os.Build.VERSION;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.SystemClock;
@@ -29,16 +30,20 @@ import com.slc.assistivetouch.model.kernel.HookConstant.ClassString;
 import com.slc.assistivetouch.model.kernel.HookConstant.MethodString;
 import com.slc.assistivetouch.model.SettingConstant.Ga;
 import com.slc.code.provider.RemotePreferences;
+import com.slc.code.receiver.ImmediatelyBroadcastReceiver;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.slc.assistivetouch.model.SettingConstant.ACTION_FAST_PAYMENT;
 
@@ -73,6 +78,10 @@ class ActionManager extends XC_MethodHook {
         }
     }
 
+    static ActionManager getInstance() {
+        return Holder.INSTANCE;
+    }
+
     @SuppressWarnings("unchecked")
     private ActionManager() {
         this.isLoadPreferences = false;
@@ -104,9 +113,6 @@ class ActionManager extends XC_MethodHook {
         }
     }
 
-    static ActionManager getInstance() {
-        return Holder.INSTANCE;
-    }
 
     /**
      * 初始化广播接收者
@@ -127,7 +133,7 @@ class ActionManager extends XC_MethodHook {
     @Override
     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
         super.afterHookedMethod(param);
-        if (!this.isLoadPreferences && param.args[1] != null) {
+        if (!this.isLoadPreferences && param.args[1] != null && MethodHookPm.getInstance().getContext() != null) {
             initPreferences();
         }
     }
@@ -348,7 +354,7 @@ class ActionManager extends XC_MethodHook {
             try {
                 launchCustomApp(Intent.parseUri(uri, Intent.URI_INTENT_SCHEME), handler);
             } catch (Throwable e) {
-                XpLog.log("launchCustomApp: error parsing uri: ", e);
+                XpLog.log("launchCustomApp: error parsing uri: " + e, true);
             }
         }
     }
@@ -368,7 +374,7 @@ class ActionManager extends XC_MethodHook {
                 } catch (ActivityNotFoundException e) {
                     Toast.makeText(MethodHookPm.getInstance().getContext(), "Activity not found", Toast.LENGTH_SHORT).show();
                 } catch (Throwable t) {
-                    XpLog.log("launchCustomApp*intent", t);
+                    XpLog.log("launchCustomApp*intent:" + t, true);
                 }
             }
         });
@@ -388,10 +394,14 @@ class ActionManager extends XC_MethodHook {
                         long eventTime = SystemClock.uptimeMillis();
                         InputManager inputManager = (InputManager) MethodHookPm.getInstance().getContext().getSystemService(Context.INPUT_SERVICE);
                         //int flags = KeyEvent.FLAG_FROM_SYSTEM;
-                        XposedHelpers.callMethod(inputManager, "injectInputEvent", new KeyEvent(eventTime - 50, eventTime - 50, KeyEvent.ACTION_DOWN, keyCode, 0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, KeyEvent.FLAG_FROM_SYSTEM, InputDevice.SOURCE_UNKNOWN), 0);
-                        XposedHelpers.callMethod(inputManager, "injectInputEvent", new KeyEvent(eventTime - 50, eventTime - 25, KeyEvent.ACTION_UP, keyCode, 0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, KeyEvent.FLAG_FROM_SYSTEM, InputDevice.SOURCE_UNKNOWN), 0);
+                        XposedHelpers.callMethod(inputManager, "injectInputEvent",
+                                new KeyEvent(eventTime - 50, eventTime - 50, KeyEvent.ACTION_DOWN, keyCode,
+                                        0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, KeyEvent.FLAG_FROM_SYSTEM, InputDevice.SOURCE_UNKNOWN), 0);
+                        XposedHelpers.callMethod(inputManager, "injectInputEvent",
+                                new KeyEvent(eventTime - 50, eventTime - 25, KeyEvent.ACTION_UP, keyCode,
+                                        0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, KeyEvent.FLAG_FROM_SYSTEM, InputDevice.SOURCE_UNKNOWN), 0);
                     } catch (Throwable t) {
-                        XpLog.log("injectKey", t);
+                        XpLog.log("injectKey" + t, true);
                     }
                 }
             });
@@ -452,7 +462,7 @@ class ActionManager extends XC_MethodHook {
         try {
             XposedHelpers.callMethod(MethodHookPm.getInstance().getPhoneWindowManager(), "dismissKeyguardLw");
         } catch (Throwable t) {
-            XpLog.log("dismissKeyguard", t);
+            XpLog.log("dismissKeyguard" + t, true);
         }
     }
 
@@ -463,7 +473,6 @@ class ActionManager extends XC_MethodHook {
     void initPreferences() {
         if (!this.isLoadPreferences) {
             Map<String, ?> allData = new RemotePreferences(MethodHookPm.getInstance().getContext(), SettingConstant.AUTHORITIES, SettingConstant.APP_PREFERENCES_NAME).getAll();
-            XpLog.log("initPreferences", allData.size() + "*", true);
             if (!this.isLoadPreferences) {
                 fillPreferences(allData);
             }
@@ -476,7 +485,7 @@ class ActionManager extends XC_MethodHook {
      * @param allData
      */
     private void fillPreferences(Map<String, ?> allData) {
-        XpLog.log("fillPreferences", allData.size() + "*", true);
+        XpLog.log("fillPreferences", allData.size() + "*", false);
         if (allData.size() != 0) {
             this.isLoadPreferences = true;
             setActionFor(HwKeyTrigger.BIXBY_SINGLETAP, Integer.parseInt(getStringByMap(allData, SettingConstant.PREF_KEY_HWKEY_BIXBY, "0")), getStringByMap(allData, SettingConstant.PREF_KEY_HWKEY_BIXBY_CUSTOM));
@@ -514,13 +523,10 @@ class ActionManager extends XC_MethodHook {
     }
 
     /**
-     * 发送系统是否为OsOxygenOsRomOrH2OsRom
+     * 添加系统是否为OxygenOsRomOrH2OsRom
      */
-    private void sendOsOxygenOsRomOrH2OsRom() {
-        Intent intent = new Intent(Ga.ACTION_RESULT_SYSTEM_INFO);
-        intent.putExtra(SettingConstant.Ga.EXTRA_KEY, SettingConstant.Ga.KEY_IS_OXYGEN_OS_ROM_OR_H2OS_ROM);
-        intent.putExtra(SettingConstant.Ga.EXTRA_VALUE, AssistiveTouch.isOxygenOsRomOrH2OsRom());
-        MethodHookPm.getInstance().getContext().sendBroadcast(intent);
+    private void addOsOxygenOsRomOrH2OsRom() {
+        mBroadcastReceiver.addSendInfo(SettingConstant.Ga.KEY_IS_OXYGEN_OS_ROM_OR_H2OS_ROM, AssistiveTouch.isOxygenOsRomOrH2OsRom());
     }
 
     /**
@@ -558,17 +564,27 @@ class ActionManager extends XC_MethodHook {
         return this.mIsSwitchAppSwitchAndBack;
     }*/
 
-    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+    private ImmediatelyBroadcastReceiver mBroadcastReceiver = new ImmediatelyBroadcastReceiver(Ga.ACTION_RESULT_SYSTEM_INFO, Ga.ACTION_REQUEST_SYSTEM_INFO) {
+
         @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            String key = intent.getStringExtra(Ga.EXTRA_KEY);
-            if (Ga.ACTION_REQUEST_SYSTEM_INFO.equals(action)) {
-                if (Ga.KEY_IS_OXYGEN_OS_ROM_OR_H2OS_ROM.equals(key)) {
-                    ActionManager.this.sendOsOxygenOsRomOrH2OsRom();
+        public boolean handlerMsg(Set<String> extraKeySet, Bundle extrasBundle) {
+            for (String extraKey : extraKeySet) {
+                if (Ga.KEY_IS_OXYGEN_OS_ROM_OR_H2OS_ROM.equals(extraKey)) {
+                    ActionManager.this.addOsOxygenOsRomOrH2OsRom();
                 }
-            } else if (SettingConstant.Ga.ACTION_PREF_HWKEY_CHANGED.equals(action)) {
+            }
+            return true;
+        }
+
+        @Override
+        protected void onOtherReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            XpLog.log("mBroadcastReceiver" + action);
+            String key = intent.getStringExtra(Ga.EXTRA_KEY);
+            XpLog.log("mBroadcastReceiver" + action);
+            if (SettingConstant.Ga.ACTION_PREF_HWKEY_CHANGED.equals(action)) {
                 int value = intent.getIntExtra(Ga.EXTRA_VALUE, 0);
+                XpLog.log("mBroadcastReceiver" + value);
                 if (SettingConstant.PREF_KEY_HWKEY_BIXBY.equals(key)) {
                     ActionManager.this.setActionFor(HwKeyTrigger.BIXBY_SINGLETAP, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_BIXBY_LONG.equals(key)) {
@@ -604,6 +620,7 @@ class ActionManager extends XC_MethodHook {
                 }
             } else if (SettingConstant.Ga.ACTION_PREF_HWKEY_CHANGED_CUSTOM.equals(action)) {
                 String value = intent.getStringExtra(Ga.EXTRA_VALUE);
+                XpLog.log("mBroadcastReceiver" + value);
                 if (SettingConstant.PREF_KEY_HWKEY_BIXBY_CUSTOM.equals(key)) {
                     ActionManager.this.setActionFor(HwKeyTrigger.BIXBY_SINGLETAP, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_BIXBY_LONG_CUSTOM.equals(key)) {
@@ -639,25 +656,29 @@ class ActionManager extends XC_MethodHook {
                 }
             } else if (SettingConstant.Ga.ACTION_PREF_HWKEY_DOUBLETAP_SPEED_CHANGED.equals(action)) {
                 ActionManager.this.mDoubletapSpeed = intent.getIntExtra(Ga.EXTRA_VALUE, ActionManager.this.mDoubletapSpeed);
+                XpLog.log("mBroadcastReceiver" + ActionManager.this.mDoubletapSpeed);
             } else if (SettingConstant.Ga.ACTION_PREF_HWKEY_KILL_DELAY_CHANGED.equals(action)) {
                 ActionManager.this.mKillDelay = intent.getIntExtra(Ga.EXTRA_VALUE, ActionManager.this.mKillDelay);
+                XpLog.log("mBroadcastReceiver" + ActionManager.this.mKillDelay);
             } else if (SettingConstant.Ga.ACTION_PREF_KEY_HWKEY_SWITCH.equals(action)) {
                 if (SettingConstant.PREF_KEY_HWKEY_MAIN_SWITCH.equals(key)) {
                     ActionManager.this.mIsOpenMainWitch = intent.getBooleanExtra(Ga.EXTRA_VALUE, false);
+                    XpLog.log("mBroadcastReceiver" + ActionManager.this.mIsOpenMainWitch);
                 } /*else if (SettingConstant.PREF_KEY_HWKEY_SWITCH_APP_SWITCH_AND_BACK.equals(key)) {
                     ActionManager.this.mIsSwitchAppSwitchAndBack = intent.getBooleanExtra(Ga.EXTRA_VALUE, false);
                 }*/
             }
         }
+
     };
     private Runnable killCurrentApplicationRunnable = new Runnable() {
         @Override
         public void run() {
             try {
-                Intent intent = new Intent("android.intent.action.MAIN");
+                Intent intent = new Intent(Intent.ACTION_MAIN);
                 PackageManager pm = MethodHookPm.getInstance().getContext().getPackageManager();
                 String defaultHomePackage = HookConstant.PACK_DEF_LAUNCHER;
-                intent.addCategory("android.intent.category.HOME");
+                intent.addCategory(Intent.CATEGORY_HOME);
                 ResolveInfo res = pm.resolveActivity(intent, 0);
                 if (!(res.activityInfo == null || res.activityInfo.packageName.equals(HookConstant.PACK_ANDROID))) {
                     defaultHomePackage = res.activityInfo.packageName;
