@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="preference_key_activities">
+        <item>默认</item>
+        <item>无动作</item>
+        <item>关闭屏幕</item>
+        <item>关闭/开启屏幕</item>
+        <item>关闭/开启手电筒</item>
+        <item>快捷支付</item>
+        <item>截屏</item>
+        <item>结束当前应用</item>
+        <item>切换到上一个应用</item>
+        <item>自定义操作</item>
+    </string-array>
+    <string-array name="preference_key_activities_index">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </string-array>
+</resources>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen>
+    <PreferenceCategory n1:title="@string/app_main_switch"
+      xmlns:n1="http://schemas.android.com/apk/res/android">
+        <SwitchPreference n1:title="@string/app_main_switch" n1:key="@string/pref_key_hwkey_main_switch" n1:summary="@string/label_main_switch_summary" />
+    </PreferenceCategory>
+    <PreferenceCategory n2:title="@string/title_bixby" n2:key="@string/pref_key_samsung_os_dedicated"
+      xmlns:n2="http://schemas.android.com/apk/res/android">
+        <ListPreference n2:entries="@array/preference_key_activities" n2:title="@string/title_press_the_operation" n2:key="@string/pref_key_hwkey_bixby" n2:dependency="@string/pref_key_hwkey_main_switch" n2:defaultValue="0" n2:entryValues="@array/preference_key_activities_index" />
+        <ListPreference n2:entries="@array/preference_key_activities" n2:title="@string/title_press_the_operation_long" n2:key="@string/pref_key_hwkey_bixby_long" n2:dependency="@string/pref_key_hwkey_main_switch" n2:defaultValue="0" n2:entryValues="@array/preference_key_activities_index" />
+        <ListPreference n2:entries="@array/preference_key_activities" n2:title="@string/title_press_the_operation_double" n2:key="@string/pref_key_hwkey_bixby_double" n2:dependency="@string/pref_key_hwkey_main_switch" n2:defaultValue="0" n2:entryValues="@array/preference_key_activities_index" />
+    </PreferenceCategory>
+    <PreferenceCategory n3:title="@string/title_home"
+      xmlns:n3="http://schemas.android.com/apk/res/android">
+        <ListPreference n3:entries="@array/preference_key_activities" n3:title="@string/title_press_the_operation_long" n3:key="@string/pref_key_hwkey_home_long" n3:dependency="@string/pref_key_hwkey_main_switch" n3:defaultValue="0" n3:entryValues="@array/preference_key_activities_index" />
+    </PreferenceCategory>
+    <PreferenceCategory n4:title="@string/title_back"
+      xmlns:n4="http://schemas.android.com/apk/res/android">
+        <ListPreference n4:entries="@array/preference_key_activities" n4:title="@string/title_press_the_operation" n4:key="@string/pref_key_hwkey_back" n4:dependency="@string/pref_key_hwkey_main_switch" n4:defaultValue="0" n4:entryValues="@array/preference_key_activities_index" />
+        <ListPreference n4:entries="@array/preference_key_activities" n4:title="@string/title_press_the_operation_long" n4:key="@string/pref_key_hwkey_back_long" n4:dependency="@string/pref_key_hwkey_main_switch" n4:defaultValue="0" n4:entryValues="@array/preference_key_activities_index" />
+        <ListPreference n4:entries="@array/preference_key_activities" n4:title="@string/title_press_the_operation_double" n4:key="@string/pref_key_hwkey_back_double" n4:dependency="@string/pref_key_hwkey_main_switch" n4:defaultValue="0" n4:entryValues="@array/preference_key_activities_index" />
+    </PreferenceCategory>
+    <PreferenceCategory n5:title="@string/title_app_switch"
+      xmlns:n5="http://schemas.android.com/apk/res/android">
+        <ListPreference n5:entries="@array/preference_key_activities" n5:title="@string/title_press_the_operation" n5:key="@string/pref_key_hwkey_app_switch" n5:dependency="@string/pref_key_hwkey_main_switch" n5:defaultValue="0" n5:entryValues="@array/preference_key_activities_index" />
+        <ListPreference n5:entries="@array/preference_key_activities" n5:title="@string/title_press_the_operation_long" n5:key="@string/pref_key_hwkey_app_switch_long" n5:dependency="@string/pref_key_hwkey_main_switch" n5:defaultValue="0" n5:entryValues="@array/preference_key_activities_index" />
+        <ListPreference n5:entries="@array/preference_key_activities" n5:title="@string/title_press_the_operation_double" n5:key="@string/pref_key_hwkey_app_switch_double" n5:dependency="@string/pref_key_hwkey_main_switch" n5:defaultValue="0" n5:entryValues="@array/preference_key_activities_index" />
+    </PreferenceCategory>
+    <PreferenceCategory n6:title="@string/title_menu"
+      xmlns:n6="http://schemas.android.com/apk/res/android">
+        <ListPreference n6:entries="@array/preference_key_activities" n6:title="@string/title_press_the_operation" n6:key="@string/pref_key_hwkey_menu" n6:dependency="@string/pref_key_hwkey_main_switch" n6:defaultValue="0" n6:entryValues="@array/preference_key_activities_index" />
+        <ListPreference n6:entries="@array/preference_key_activities" n6:title="@string/title_press_the_operation_long" n6:key="@string/pref_key_hwkey_menu_long" n6:dependency="@string/pref_key_hwkey_main_switch" n6:defaultValue="0" n6:entryValues="@array/preference_key_activities_index" />
+        <ListPreference n6:entries="@array/preference_key_activities" n6:title="@string/title_press_the_operation_double" n6:key="@string/pref_key_hwkey_menu_double" n6:dependency="@string/pref_key_hwkey_main_switch" n6:defaultValue="0" n6:entryValues="@array/preference_key_activities_index" />
+    </PreferenceCategory>
+    <PreferenceCategory n7:title="@string/title_other"
+      xmlns:n7="http://schemas.android.com/apk/res/android">
+        <SwitchPreference n7:title="@string/title_switch_button" n7:key="@string/pref_key_hwkey_switch_app_switch_and_back" n7:summary="@string/title_switch_app_switch_and_back" n7:dependency="@string/pref_key_hwkey_main_switch" />
+    </PreferenceCategory>
+    <PreferenceCategory n8:title="@string/title_about"
+      xmlns:n8="http://schemas.android.com/apk/res/android">
+        <Preference n8:title="@string/title_donate" n8:key="@string/pref_key_donate" n8:summary="@string/label_donate_summary" />
+        <Preference n8:title="@string/title_author" n8:summary="on the way" />
+    </PreferenceCategory>
+</PreferenceScreen>
