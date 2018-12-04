@@ -35,7 +35,7 @@
     <string name="pref_key_samsung_os_dedicated">pref_key_samsung_os_dedicated</string>
     <string name="title_about">关于</string>
     <string name="title_alipay">支付宝</string>
-    <string name="title_app_switch">最近任务键键</string>
+    <string name="title_app_switch">最近任务键</string>
     <string name="title_author">作者</string>
     <string name="title_back">返回键</string>
     <string name="title_bixby">Bixby键</string>
@@ -55,7 +55,5 @@
     <string name="toast_no_inset_alipay">没有安装支付宝</string>
     <string name="toast_no_inset_wx">没有安装微信</string>
     <string name="toast_pleas_select_model">请在Xposed Installer中勾选此模块</string>
-    <string name="tue">Tue</string>
-    <string name="wed">Wed</string>
     <string name="xposed_desc">更改各种实体按键和虚拟按键的动作</string>
 </resources>
