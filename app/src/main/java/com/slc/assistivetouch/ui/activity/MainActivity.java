@@ -26,15 +26,12 @@ public class MainActivity extends NativeToolBarActivity<MainContract.MainPresent
         MainPresenterImp.initialize(this);
     }
 
-    @Override
-    public void loadFragment(boolean isOxygenOsRomOrH2OsRom, boolean isAllowOpen) {
+    public void loadFragment(Bundle bundle) {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         MainSettingFragment mainSettingFragment = new MainSettingFragment();
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(SettingConstant.Ga.KEY_IS_OXYGEN_OS_ROM_OR_H2OS_ROM, isOxygenOsRomOrH2OsRom);
-        bundle.putBoolean(SettingConstant.Ga.KEY_IS_ALLOW_OPEN, isAllowOpen);
         mainSettingFragment.setArguments(bundle);
         fragmentTransaction.add(R.id.fl_content, mainSettingFragment);
         fragmentTransaction.commit();
     }
+
 }
