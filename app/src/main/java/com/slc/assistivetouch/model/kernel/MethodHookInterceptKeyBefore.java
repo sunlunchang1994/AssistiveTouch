@@ -41,6 +41,17 @@ public class MethodHookInterceptKeyBefore {
     private static boolean mWasBixbyDoubleTap = false;
     private static boolean mWasMenuDoubleTap = false;
     private ActionManager actionManager = ActionManager.getInstance();
+
+    private static class Holder {
+        private static final MethodHookInterceptKeyBefore INSTANCE = new MethodHookInterceptKeyBefore();
+
+        private Holder() {
+        }
+    }
+
+    static MethodHookInterceptKeyBefore getInstance() {
+        return Holder.INSTANCE;
+    }
     private XC_MethodHook interceptKeyBeforeDispatchingMethodHook = new XC_MethodHook() {
         @Override
         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -48,7 +59,7 @@ public class MethodHookInterceptKeyBefore {
                 if ((Boolean) XposedHelpers.callMethod(MethodHookPm.getInstance().getPhoneWindowManager(), "keyguardOn"))
                     return;
                 KeyEvent event = (KeyEvent) param.args[1];
-                int keyCode = MethodHookInterceptKeyBefore.this.getKeyCode(event);
+                int keyCode = event.getKeyCode();
                 boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
                 boolean isFromSystem = (event.getFlags() & KeyEvent.FLAG_FROM_SYSTEM) != 0;
                 XpLog.log("interceptKeyBeforeDispatching: keyCode=" + keyCode +
@@ -66,7 +77,7 @@ public class MethodHookInterceptKeyBefore {
 
                 Handler mHandler = (Handler) XposedHelpers.getObjectField(param.thisObject, "mHandler");
 
-                if (keyCode == KeyEvent.KEYCODE_MENU && isFromSystem && !ActionManager.getInstance().isTaskLocked() && (ActionManager.getInstance().hasAction(HwKey.MENU) || !areHwKeysEnabled())) {
+                if (keyCode == KeyEvent.KEYCODE_MENU && isFromSystem && !ActionManager.getInstance().isTaskLocked() && ActionManager.getInstance().hasAction(HwKey.MENU)) {
                     if (!down) {
                         mMenuKeyPressed = false;
                         mHandler.removeCallbacks(mMenuLongPress);
@@ -76,9 +87,7 @@ public class MethodHookInterceptKeyBefore {
                             param.setResult(-1);
                             return;
                         } else if (event.getRepeatCount() == 0) {
-                            if (!areHwKeysEnabled()) {
-                                XpLog.log("MENU KeyEvent coming from HW key and keys disabled. Ignoring.");
-                            } else if (mIsMenuDoubleTap) {
+                            if (mIsMenuDoubleTap) {
                                 // we are still waiting for double-tap
                                 XpLog.log("MENU doubletap pending. Ignoring.");
                             } else if (mIsMenuIterationPressed) {
@@ -88,7 +97,7 @@ public class MethodHookInterceptKeyBefore {
                                     ActionManager.getInstance().performAction(HwKeyTrigger.MENU_SINGLETAP);
                                 } else {
                                     XpLog.log("Triggering original DOWN/UP events for MENU key");
-                                    injectKey(KeyEvent.KEYCODE_MENU);
+                                    actionManager.injectKey(KeyEvent.KEYCODE_MENU);
                                 }
                             }
                             param.setResult(-1);
@@ -121,8 +130,7 @@ public class MethodHookInterceptKeyBefore {
                     }
                 }
 
-                if (keyCode == KeyEvent.KEYCODE_BACK && isFromSystem && !ActionManager.getInstance().isTaskLocked() &&
-                        (ActionManager.getInstance().hasAction(HwKey.BACK) || !areHwKeysEnabled())) {
+                if (keyCode == KeyEvent.KEYCODE_BACK && isFromSystem && !ActionManager.getInstance().isTaskLocked() && ActionManager.getInstance().hasAction(HwKey.BACK)) {
                     if (!down) {
                         mBackKeyPressed = false;
                         mHandler.removeCallbacks(mBackLongPress);
@@ -132,9 +140,7 @@ public class MethodHookInterceptKeyBefore {
                             param.setResult(-1);
                             return;
                         } else if (event.getRepeatCount() == 0) {
-                            if (!areHwKeysEnabled()) {
-                                XpLog.log("BACK KeyEvent coming from HW key and keys disabled. Ignoring.");
-                            } else if (mIsBackDoubleTap) {
+                            if (mIsBackDoubleTap) {
                                 // we are still waiting for double-tap
                                 XpLog.log("BACK doubletap pending. Ignoring.");
                             } else if (mIsBackIterationPressed) {
@@ -144,7 +150,7 @@ public class MethodHookInterceptKeyBefore {
                                     ActionManager.getInstance().performAction(HwKeyTrigger.BACK_SINGLETAP);
                                 } else {
                                     XpLog.log("Triggering original DOWN/UP events for BACK key");
-                                    injectKey(KeyEvent.KEYCODE_BACK);
+                                    actionManager.injectKey(KeyEvent.KEYCODE_BACK);
                                 }
                             }
                             param.setResult(-1);
@@ -179,8 +185,7 @@ public class MethodHookInterceptKeyBefore {
                     }
                 }
 
-                if (keyCode == KeyEvent.KEYCODE_APP_SWITCH && isFromSystem && !ActionManager.getInstance().isTaskLocked() &&
-                        (ActionManager.getInstance().hasAction(HwKey.APP_SWITCH) || !areHwKeysEnabled())) {
+                if (keyCode == KeyEvent.KEYCODE_APP_SWITCH && isFromSystem && !ActionManager.getInstance().isTaskLocked() && ActionManager.getInstance().hasAction(HwKey.APP_SWITCH)) {
                     if (!down) {
                         mAppSwitchKeyPressed = false;
                         mHandler.removeCallbacks(mAppSwitchLongPress);
@@ -190,9 +195,7 @@ public class MethodHookInterceptKeyBefore {
                             param.setResult(-1);
                             return;
                         } else if (event.getRepeatCount() == 0) {
-                            if (!areHwKeysEnabled()) {
-                                XpLog.log("APP_SWITCH KeyEvent coming from HW key and keys disabled. Ignoring.");
-                            } else if (mIsAppSwitchDoubleTap) {
+                            if (mIsAppSwitchDoubleTap) {
                                 // we are still waiting for double-tap
                                 XpLog.log("APP_SWITCH doubletap pending. Ignoring.");
                             } else if (mIsAppSwitchIterationPressed) {
@@ -203,7 +206,7 @@ public class MethodHookInterceptKeyBefore {
                                     ActionManager.getInstance().performAction(HwKeyTrigger.APP_SWITCH_SINGLETAP);
                                 } else {
                                     XpLog.log("Triggering original DOWN/UP events for APP_SWITCH key");
-                                    injectKey(KeyEvent.KEYCODE_APP_SWITCH);
+                                    actionManager.injectKey(KeyEvent.KEYCODE_APP_SWITCH);
                                 }
                             }
                             param.setResult(-1);
@@ -241,8 +244,7 @@ public class MethodHookInterceptKeyBefore {
                         XpLog.log("此处有长按事件");
                     }
                 }
-                if (keyCode == SamsungKeyEvent.KEYCODE_BIXBY && isFromSystem && !ActionManager.getInstance().isTaskLocked() &&
-                        (ActionManager.getInstance().hasAction(HwKey.BIXBY) || !areHwKeysEnabled())) {
+                if (keyCode == SamsungKeyEvent.KEYCODE_BIXBY && isFromSystem && !ActionManager.getInstance().isTaskLocked() && ActionManager.getInstance().hasAction(HwKey.BIXBY)) {
                     if (down) {
                         if (event.getRepeatCount() == 0) {
                             mIsBixbyIterationPressed = false;
@@ -284,7 +286,7 @@ public class MethodHookInterceptKeyBefore {
                         event.getSource() == HookConstant.PA_SOURCE_CUSTOM) {
                     // ignore unknown source events, e.g. synthetic events injected from GB itself
                     XpLog.log("interceptKeyBeforeQueueing: ignoring event from unknown source");
-                    if (Utils.isOxygenOsRom()||Utils.isH2OsRom()) {
+                    if (Utils.isOxygenOsRom() || Utils.isH2OsRom()) {
                         // mangle OOS3.5 key event to allow pass-through and to avoid double-vibrations
                         event = KeyEvent.changeFlags(event, event.getFlags() | KeyEvent.FLAG_VIRTUAL_HARD_KEY);
                         event.setSource(InputDevice.SOURCE_KEYBOARD);
@@ -305,9 +307,7 @@ public class MethodHookInterceptKeyBefore {
                             param.setResult(0);
                             return;
                         }
-                        if (!areHwKeysEnabled() &&
-                                event.getRepeatCount() == 0 &&
-                                (event.getFlags() & KeyEvent.FLAG_FROM_SYSTEM) != 0) {
+                        if (event.getRepeatCount() == 0 && (event.getFlags() & KeyEvent.FLAG_FROM_SYSTEM) != 0) {
                             XpLog.log("HOME KeyEvent coming from HW key and keys disabled. Ignoring.");
                             param.setResult(0);
                             return;
@@ -327,8 +327,7 @@ public class MethodHookInterceptKeyBefore {
                         return;
                     }
                 }
-                if (keyCode == SamsungKeyEvent.KEYCODE_BIXBY && isFromSystem && !ActionManager.getInstance().isTaskLocked() &&
-                        (ActionManager.getInstance().hasAction(HwKey.BIXBY) || !areHwKeysEnabled())) {
+                if (keyCode == SamsungKeyEvent.KEYCODE_BIXBY && isFromSystem && !ActionManager.getInstance().isTaskLocked() && ActionManager.getInstance().hasAction(HwKey.BIXBY)) {
                     if (!down) {
                         mBixbyKeyPressed = false;
                         mHandler.removeCallbacks(mBixbyLongPress);
@@ -338,9 +337,7 @@ public class MethodHookInterceptKeyBefore {
                             param.setResult(-1);
                             return;
                         } else if (event.getRepeatCount() == 0) {
-                            if (!areHwKeysEnabled()) {
-                                XpLog.log("BIXBY KeyEvent coming from HW key and keys disabled. Ignoring.");
-                            } else if (mIsBixbyDoubleTap) {
+                            if (mIsBixbyDoubleTap) {
                                 // we are still waiting for double-tap
                                 XpLog.log("BIXBY doubletap pending. Ignoring.");
                             } else if (mIsBixbyIterationPressed) {
@@ -351,7 +348,7 @@ public class MethodHookInterceptKeyBefore {
                                     XpLog.log("此处走到bug");
                                 } else {
                                     XpLog.log("Triggering original DOWN/UP events for BIXBY key");
-                                    injectKey(SamsungKeyEvent.KEYCODE_BIXBY);
+                                    actionManager.injectKey(SamsungKeyEvent.KEYCODE_BIXBY);
                                 }
                             }
                             param.setResult(-1);
@@ -389,14 +386,14 @@ public class MethodHookInterceptKeyBefore {
     private Runnable mAppSwitchDoubleTapReset = new Runnable() {
         public void run() {
             MethodHookInterceptKeyBefore.mIsAppSwitchDoubleTap = false;
-            if (!MethodHookInterceptKeyBefore.mAppSwitchKeyPressed && MethodHookInterceptKeyBefore.this.areHwKeysEnabled()) {
+            if (!MethodHookInterceptKeyBefore.mAppSwitchKeyPressed) {
                 if (MethodHookInterceptKeyBefore.this.actionManager.getActionFor(HwKeyTrigger.APP_SWITCH_SINGLETAP).actionId != 0) {
                     XpLog.log("APP_SWITCH key double tap timed out and key not pressed; performing singletap action");
                     MethodHookInterceptKeyBefore.this.actionManager.performAction(HwKeyTrigger.APP_SWITCH_SINGLETAP);
                     return;
                 }
                 XpLog.log("APP_SWITCH key double tap timed out and key not pressed; injecting APP_SWITCH key");
-                MethodHookInterceptKeyBefore.this.injectKey(KeyEvent.KEYCODE_APP_SWITCH);
+                MethodHookInterceptKeyBefore.this.actionManager.injectKey(KeyEvent.KEYCODE_APP_SWITCH);
             }
         }
     };
@@ -410,14 +407,14 @@ public class MethodHookInterceptKeyBefore {
     private Runnable mBackDoubleTapReset = new Runnable() {
         public void run() {
             MethodHookInterceptKeyBefore.mIsBackDoubleTap = false;
-            if (!MethodHookInterceptKeyBefore.mBackKeyPressed && MethodHookInterceptKeyBefore.this.areHwKeysEnabled()) {
+            if (!MethodHookInterceptKeyBefore.mBackKeyPressed) {
                 if (MethodHookInterceptKeyBefore.this.actionManager.getActionFor(HwKeyTrigger.BACK_SINGLETAP).actionId != 0) {
                     XpLog.log("BACK key double tap timed out and key not pressed; performing singletap action");
                     MethodHookInterceptKeyBefore.this.actionManager.performAction(HwKeyTrigger.BACK_SINGLETAP);
                     return;
                 }
                 XpLog.log("BACK key double tap timed out and key not pressed; injecting BACK key");
-                MethodHookInterceptKeyBefore.this.injectKey(KeyEvent.KEYCODE_BACK);
+                MethodHookInterceptKeyBefore.this.actionManager.injectKey(KeyEvent.KEYCODE_BACK);
             }
         }
     };
@@ -431,14 +428,14 @@ public class MethodHookInterceptKeyBefore {
     private Runnable mBixbyDoubleTapReset = new Runnable() {
         public void run() {
             MethodHookInterceptKeyBefore.mIsBixbyDoubleTap = false;
-            if (!MethodHookInterceptKeyBefore.mBixbyKeyPressed && MethodHookInterceptKeyBefore.this.areHwKeysEnabled()) {
+            if (!MethodHookInterceptKeyBefore.mBixbyKeyPressed) {
                 if (MethodHookInterceptKeyBefore.this.actionManager.getActionFor(HwKeyTrigger.BIXBY_SINGLETAP).actionId != 0) {
                     XpLog.log("BIXBY key double tap timed out and key not pressed; performing singletap action");
                     MethodHookInterceptKeyBefore.this.actionManager.performAction(HwKeyTrigger.BIXBY_SINGLETAP);
                     return;
                 }
                 XpLog.log("BIXBY key double tap timed out and key not pressed; injecting BIXBY key");
-                MethodHookInterceptKeyBefore.this.injectKey(SamsungKeyEvent.KEYCODE_BIXBY);
+                MethodHookInterceptKeyBefore.this.actionManager.injectKey(SamsungKeyEvent.KEYCODE_BIXBY);
             }
         }
     };
@@ -465,7 +462,7 @@ public class MethodHookInterceptKeyBefore {
                     return;
                 }
                 XpLog.log("MENU key double tap timed out and key not pressed; injecting MENU key");
-                MethodHookInterceptKeyBefore.this.injectKey(82);
+                MethodHookInterceptKeyBefore.this.actionManager.injectKey(KeyEvent.KEYCODE_MENU);
             }
         }
     };
@@ -477,27 +474,16 @@ public class MethodHookInterceptKeyBefore {
         }
     };
 
-    private static class Holder {
-        private static final MethodHookInterceptKeyBefore INSTANCE = new MethodHookInterceptKeyBefore();
-
-        private Holder() {
-        }
-    }
-
-    static MethodHookInterceptKeyBefore getInstance() {
-        return Holder.INSTANCE;
-    }
-
-    private int getKeyCode(KeyEvent event) {
+    /*private int getKeyCode(KeyEvent event) {
         if (this.actionManager.isIsSwitchAppSwitchAndBack()) {
-            if (event.getKeyCode() == 4) {
+            if (event.getKeyCode() == KeyEvent.KEYCODE_APP_SWITCH) {
                 XposedHelpers.setIntField(event, "mKeyCode", KeyEvent.KEYCODE_APP_SWITCH);
-            } else if (event.getKeyCode() == 187) {
+            } else if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
                 XposedHelpers.setIntField(event, "mKeyCode", KeyEvent.KEYCODE_BACK);
             }
         }
         return event.getKeyCode();
-    }
+    }*/
 
     XC_MethodHook getInterceptKeyBeforeQueueingMethodHook() {
         return this.interceptKeyBeforeQueueingMethodHook;
@@ -511,25 +497,8 @@ public class MethodHookInterceptKeyBefore {
         return action == -1 ? this.actionManager.getKillDelay() : ViewConfiguration.getLongPressTimeout();
     }
 
-    private boolean areHwKeysEnabled() {
+    /*private boolean areHwKeysEnabled() {
         return mHwKeysEnabled;
-    }
+    }*/
 
-    void injectKey(final int keyCode) {
-        Handler handler = this.actionManager.getSystemHandler();
-        if (handler != null) {
-            handler.post(new Runnable() {
-                public void run() {
-                    try {
-                        long eventTime = SystemClock.uptimeMillis();
-                        InputManager inputManager = (InputManager) MethodHookPm.getInstance().getContext().getSystemService(Context.INPUT_SERVICE);
-                        XposedHelpers.callMethod(inputManager, "injectInputEvent", new KeyEvent(eventTime - 50, eventTime - 50, 0, keyCode, 0, 0, -1, 0, 8, 0), 0);
-                        XposedHelpers.callMethod(inputManager, "injectInputEvent", new KeyEvent(eventTime - 50, eventTime - 25, 1, keyCode, 0, 0, -1, 0, 8, 0), 0);
-                    } catch (Throwable t) {
-                        XpLog.log("injectKey", t);
-                    }
-                }
-            });
-        }
-    }
 }

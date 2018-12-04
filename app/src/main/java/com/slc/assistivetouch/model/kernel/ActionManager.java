@@ -11,12 +11,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.hardware.input.InputManager;
 import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.view.InputDevice;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.widget.Toast;
 
 import com.slc.assistivetouch.model.SettingConstant;
@@ -44,7 +48,7 @@ class ActionManager extends XC_MethodHook {
     private int mDoubletapSpeed;
     private Map<HwKeyTrigger, HwKeyAction> mHwKeyActions;
     private boolean mIsOpenMainWitch;
-    private boolean mIsSwitchAppSwitchAndBack;
+    //private boolean mIsSwitchAppSwitchAndBack;
     private int mKillDelay;
     private List<String> mKillIgnoreList;
     private PowerManager mPowerManager;
@@ -58,24 +62,22 @@ class ActionManager extends XC_MethodHook {
         int actionId;
         String customApp;
 
-        public HwKeyAction(int id) {
-            this.actionId = id;
-        }
-
         HwKeyAction(int id, String cApp) {
             this.actionId = id;
             this.customApp = cApp;
         }
 
+        @SuppressWarnings("all")
         public HwKeyAction clone() {
             return new HwKeyAction(this.actionId, this.customApp);
         }
     }
+
     @SuppressWarnings("unchecked")
     private ActionManager() {
         this.isLoadPreferences = false;
         this.mIsOpenMainWitch = false;
-        this.mIsSwitchAppSwitchAndBack = false;
+        //this.mIsSwitchAppSwitchAndBack = false;
         this.mKillIgnoreList = new ArrayList();
 
         this.mKillIgnoreList.add(HookConstant.PACK_SYSTEM_UI);
@@ -108,6 +110,7 @@ class ActionManager extends XC_MethodHook {
 
     /**
      * 初始化广播接收者
+     *
      * @param context
      */
     final void initActionReceiver(Context context) {
@@ -120,6 +123,7 @@ class ActionManager extends XC_MethodHook {
         intentFilter.addAction(Ga.ACTION_PREF_KEY_HWKEY_SWITCH);
         context.registerReceiver(this.mBroadcastReceiver, intentFilter);
     }
+
     @Override
     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
         super.afterHookedMethod(param);
@@ -183,9 +187,17 @@ class ActionManager extends XC_MethodHook {
             } else if (action.actionId == SettingConstant.HWKEY_ACTION_TURN_OFF_OR_ON_TORCH) {
                 toggleTorch();
             } else if (action.actionId == SettingConstant.HWKEY_ACTION_FAST_PAYMENT) {
-                MethodHookPm.getInstance().getContext().startActivity(new Intent(ACTION_FAST_PAYMENT));
+                showFastPayment();
             } else if (action.actionId == SettingConstant.HWKEY_ACTION_SCREENSHOT) {
                 screenshot();
+            } else if (action.actionId == SettingConstant.HWKEY_ACTION_BACK) {
+                back();
+            } else if (action.actionId == SettingConstant.HWKEY_ACTION_SHOW_LAUNCHER) {
+                showHome();
+            } else if (action.actionId == SettingConstant.HWKEY_ACTION_SHOW_RECENT_APPS) {
+                showRecentApps();
+            } else if (action.actionId == SettingConstant.HWKEY_ACTION_SHOW_MENU) {
+                showMenu();
             } else if (action.actionId == SettingConstant.HWKEY_ACTION_KILL_CURRENT_APPLICATION) {
                 killCurrentApplication();
             } else if (action.actionId == SettingConstant.HWKEY_ACTION_SWITCH_TO_LAST_APP) {
@@ -196,6 +208,9 @@ class ActionManager extends XC_MethodHook {
         }
     }
 
+    /**
+     * 息屏
+     */
     private void goToSleep() {
         try {
             XpLog.log("开始息屏");
@@ -205,6 +220,9 @@ class ActionManager extends XC_MethodHook {
         }
     }
 
+    /**
+     * 唤醒
+     */
     private void wakeUp() {
         try {
             XpLog.log("开始唤醒");
@@ -214,6 +232,9 @@ class ActionManager extends XC_MethodHook {
         }
     }
 
+    /**
+     * 开关屏幕
+     */
     private void turnOffOrOnScreen() {
         if (getPowerManager().isInteractive()) {
             goToSleep();
@@ -222,6 +243,9 @@ class ActionManager extends XC_MethodHook {
         }
     }
 
+    /**
+     * 手电筒
+     */
     private void toggleTorch() {
         Handler handler = getSystemHandler();
         if (handler != null) {
@@ -232,6 +256,18 @@ class ActionManager extends XC_MethodHook {
         }
     }
 
+    /**
+     * 显示快捷支付
+     */
+    private void showFastPayment() {
+        Handler handler = getSystemHandler();
+        if (handler != null)
+            launchCustomApp(new Intent(ACTION_FAST_PAYMENT), handler);
+    }
+
+    /**
+     * 截屏
+     */
     private void screenshot() {
         Handler handler = getSystemHandler();
         if (handler != null) {
@@ -241,6 +277,41 @@ class ActionManager extends XC_MethodHook {
         }
     }
 
+    /**
+     * 返回
+     */
+    private void back() {
+        injectKey(KeyEvent.KEYCODE_BACK);
+    }
+
+    /**
+     * 显示桌面
+     */
+    private void showHome() {
+        injectKey(KeyEvent.KEYCODE_HOME);
+    }
+
+    /**
+     * 显示最近应用程序
+     */
+    private void showRecentApps() {
+        try {
+            XposedHelpers.callMethod(MethodHookPm.getInstance().getPhoneWindowManager(), "toggleRecentApps");
+        } catch (Throwable t) {
+            XpLog.log("Error executing toggleRecentApps(): ", t, true);
+        }
+    }
+
+    /**
+     * 显示菜单
+     */
+    private void showMenu() {
+        injectKey(KeyEvent.KEYCODE_MENU);
+    }
+
+    /**
+     * 结束当前应用
+     */
     private void killCurrentApplication() {
         Handler handler = getSystemHandler();
         if (handler != null) {
@@ -248,6 +319,9 @@ class ActionManager extends XC_MethodHook {
         }
     }
 
+    /**
+     * 切换上一个应用
+     */
     private void switchToLastApp() {
         Handler handler = getSystemHandler();
         if (handler != null) {
@@ -255,6 +329,11 @@ class ActionManager extends XC_MethodHook {
         }
     }
 
+    /**
+     * 启动自定义功能
+     *
+     * @param uri
+     */
     private void launchCustomApp(String uri) {
         Handler handler = getSystemHandler();
         if (handler != null) {
@@ -274,6 +353,12 @@ class ActionManager extends XC_MethodHook {
         }
     }
 
+    /**
+     * 启动自定义功能
+     *
+     * @param intent
+     * @param handler
+     */
     private void launchCustomApp(final Intent intent, Handler handler) {
         handler.post(new Runnable() {
             public void run() {
@@ -289,6 +374,36 @@ class ActionManager extends XC_MethodHook {
         });
     }
 
+    /**
+     * 注入按键
+     *
+     * @param keyCode
+     */
+    void injectKey(final int keyCode) {
+        Handler handler = getSystemHandler();
+        if (handler != null) {
+            handler.post(new Runnable() {
+                public void run() {
+                    try {
+                        long eventTime = SystemClock.uptimeMillis();
+                        InputManager inputManager = (InputManager) MethodHookPm.getInstance().getContext().getSystemService(Context.INPUT_SERVICE);
+                        //int flags = KeyEvent.FLAG_FROM_SYSTEM;
+                        XposedHelpers.callMethod(inputManager, "injectInputEvent", new KeyEvent(eventTime - 50, eventTime - 50, KeyEvent.ACTION_DOWN, keyCode, 0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, KeyEvent.FLAG_FROM_SYSTEM, InputDevice.SOURCE_UNKNOWN), 0);
+                        XposedHelpers.callMethod(inputManager, "injectInputEvent", new KeyEvent(eventTime - 50, eventTime - 25, KeyEvent.ACTION_UP, keyCode, 0, 0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, KeyEvent.FLAG_FROM_SYSTEM, InputDevice.SOURCE_UNKNOWN), 0);
+                    } catch (Throwable t) {
+                        XpLog.log("injectKey", t);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * 是否上锁
+     *
+     * @return
+     */
+    @SuppressWarnings("all")
     boolean isTaskLocked() {
         if (VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return getActivityManager().getLockTaskModeState() != 0;
@@ -297,6 +412,11 @@ class ActionManager extends XC_MethodHook {
         }
     }
 
+    /**
+     * 获取电源管理器
+     *
+     * @return
+     */
     private PowerManager getPowerManager() {
         if (this.mPowerManager == null) {
             this.mPowerManager = (PowerManager) MethodHookPm.getInstance().getContext().getSystemService(Context.POWER_SERVICE);
@@ -304,6 +424,11 @@ class ActionManager extends XC_MethodHook {
         return this.mPowerManager;
     }
 
+    /**
+     * 获取活动管理器
+     *
+     * @return
+     */
     private ActivityManager getActivityManager() {
         if (this.mActivityManager == null) {
             this.mActivityManager = (ActivityManager) MethodHookPm.getInstance().getContext().getSystemService(Context.ACTIVITY_SERVICE);
@@ -311,10 +436,18 @@ class ActionManager extends XC_MethodHook {
         return this.mActivityManager;
     }
 
+    /**
+     * 获取handler
+     *
+     * @return
+     */
     Handler getSystemHandler() {
         return (Handler) XposedHelpers.getObjectField(MethodHookPm.getInstance().getPhoneWindowManager(), "mHandler");
     }
 
+    /**
+     * 接触键盘
+     */
     private void dismissKeyguard() {
         try {
             XposedHelpers.callMethod(MethodHookPm.getInstance().getPhoneWindowManager(), "dismissKeyguardLw");
@@ -331,12 +464,17 @@ class ActionManager extends XC_MethodHook {
         if (!this.isLoadPreferences) {
             Map<String, ?> allData = new RemotePreferences(MethodHookPm.getInstance().getContext(), SettingConstant.AUTHORITIES, SettingConstant.APP_PREFERENCES_NAME).getAll();
             XpLog.log("initPreferences", allData.size() + "*", true);
-            if (!this.isLoadPreferences ) {
+            if (!this.isLoadPreferences) {
                 fillPreferences(allData);
             }
         }
     }
 
+    /**
+     * 填充Preferences
+     *
+     * @param allData
+     */
     private void fillPreferences(Map<String, ?> allData) {
         XpLog.log("fillPreferences", allData.size() + "*", true);
         if (allData.size() != 0) {
@@ -361,8 +499,8 @@ class ActionManager extends XC_MethodHook {
             this.mKillDelay = Integer.parseInt(getStringByMap(allData, SettingConstant.PREF_KEY_HWKEY_KILL_DELAY, "1000"));
             Boolean isOpenMainWitchTemp = (Boolean) allData.get(SettingConstant.PREF_KEY_HWKEY_MAIN_SWITCH);
             this.mIsOpenMainWitch = isOpenMainWitchTemp == null ? false : isOpenMainWitchTemp;
-            Boolean isSwitchAppSwitchAndBack = (Boolean) allData.get(SettingConstant.PREF_KEY_HWKEY_SWITCH_APP_SWITCH_AND_BACK);
-            this.mIsSwitchAppSwitchAndBack = isSwitchAppSwitchAndBack == null ? false : isSwitchAppSwitchAndBack;
+            /*Boolean isSwitchAppSwitchAndBack = (Boolean) allData.get(SettingConstant.PREF_KEY_HWKEY_SWITCH_APP_SWITCH_AND_BACK);
+            this.mIsSwitchAppSwitchAndBack = isSwitchAppSwitchAndBack == null ? false : isSwitchAppSwitchAndBack;*/
         }
     }
 
@@ -375,6 +513,9 @@ class ActionManager extends XC_MethodHook {
         return (String) allData.get(key);
     }
 
+    /**
+     * 发送系统是否为OsOxygenOsRomOrH2OsRom
+     */
     private void sendOsOxygenOsRomOrH2OsRom() {
         Intent intent = new Intent(Ga.ACTION_RESULT_SYSTEM_INFO);
         intent.putExtra(SettingConstant.Ga.EXTRA_KEY, SettingConstant.Ga.KEY_IS_OXYGEN_OS_ROM_OR_H2OS_ROM);
@@ -382,10 +523,20 @@ class ActionManager extends XC_MethodHook {
         MethodHookPm.getInstance().getContext().sendBroadcast(intent);
     }
 
+    /**
+     * 获取双击间隔
+     *
+     * @return
+     */
     int getDoubletapSpeed() {
         return this.mDoubletapSpeed;
     }
 
+    /**
+     * 获取杀死应用程序时间
+     *
+     * @return
+     */
     int getKillDelay() {
         return this.mKillDelay;
     }
@@ -394,13 +545,18 @@ class ActionManager extends XC_MethodHook {
         return this.isLoadPreferences;
     }
 
+    /**
+     * 是否打开总开关
+     *
+     * @return
+     */
     boolean isIsOpenMainWitch() {
         return this.mIsOpenMainWitch;
     }
 
-    boolean isIsSwitchAppSwitchAndBack() {
+    /*boolean isIsSwitchAppSwitchAndBack() {
         return this.mIsSwitchAppSwitchAndBack;
-    }
+    }*/
 
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -488,9 +644,9 @@ class ActionManager extends XC_MethodHook {
             } else if (SettingConstant.Ga.ACTION_PREF_KEY_HWKEY_SWITCH.equals(action)) {
                 if (SettingConstant.PREF_KEY_HWKEY_MAIN_SWITCH.equals(key)) {
                     ActionManager.this.mIsOpenMainWitch = intent.getBooleanExtra(Ga.EXTRA_VALUE, false);
-                } else if (SettingConstant.PREF_KEY_HWKEY_SWITCH_APP_SWITCH_AND_BACK.equals(key)) {
+                } /*else if (SettingConstant.PREF_KEY_HWKEY_SWITCH_APP_SWITCH_AND_BACK.equals(key)) {
                     ActionManager.this.mIsSwitchAppSwitchAndBack = intent.getBooleanExtra(Ga.EXTRA_VALUE, false);
-                }
+                }*/
             }
         }
     };

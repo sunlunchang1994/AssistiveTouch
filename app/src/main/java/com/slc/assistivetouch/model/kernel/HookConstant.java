@@ -1,13 +1,14 @@
 package com.slc.assistivetouch.model.kernel;
 
 public class HookConstant {
-    public static final int FLAG_WAKE = 1;
-    public static final int FLAG_WAKE_DROPPED = 2;
+
+    private static final int FLAG_WAKE = 0x00000001;
+    private static final int FLAG_WAKE_DROPPED = 0x00000002;
+    public static final int PA_SOURCE_CUSTOM = 0x08000000 | 0x00000001;
     public static final String PACK_ANDROID = "android";
     public static final String PACK_DEF_LAUNCHER = "com.android.launcher";
     public static final String PACK_SYSTEM_UI = "com.android.systemui";
     public static final String PATH_PREFERENCES_N_START = "/data/user_de/0/com.slc.assistivetouch/shared_prefs/com.slc.assistivetouch_preferences.xml";
-    public static final int PA_SOURCE_CUSTOM = 134217729;
     public static final int TAKE_SCREENSHOT_FULLSCREEN = 1;
 
     public static class ClassString {
