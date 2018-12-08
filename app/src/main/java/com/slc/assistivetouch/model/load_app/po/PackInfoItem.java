@@ -8,7 +8,9 @@ import android.graphics.drawable.BitmapDrawable;
 
 import com.slc.assistivetouch.model.load_app.Utils;
 
-public class PackInfoItem {
+import java.io.Serializable;
+
+public class PackInfoItem implements Serializable {
     private BitmapDrawable mAppIcon;
     private String mAppName;
     private PackInfoItemAssist mPackInfoItemAssist;

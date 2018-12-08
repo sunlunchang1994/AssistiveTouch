@@ -169,16 +169,12 @@ class ActionManager extends XC_MethodHook {
         return this.mHwKeyActions.get(keyTrigger);
     }
 
-    final void setActionFor(HwKeyTrigger keyTrigger, int value) {
-        setActionFor(keyTrigger, value, null);
+    final void setActionFor(HwKeyTrigger keyTrigger, int actionId) {
+        setActionFor(keyTrigger, actionId, null);
     }
 
-    final void setActionFor(HwKeyTrigger keyTrigger, String value) {
-        setActionFor(keyTrigger, 9, value);
-    }
-
-    final void setActionFor(HwKeyTrigger keyTrigger, int value, String customApp) {
-        this.mHwKeyActions.get(keyTrigger).actionId = value;
+    final void setActionFor(HwKeyTrigger keyTrigger, int actionId, String customApp) {
+        this.mHwKeyActions.get(keyTrigger).actionId = actionId;
         this.mHwKeyActions.get(keyTrigger).customApp = customApp;
     }
 
@@ -352,7 +348,7 @@ class ActionManager extends XC_MethodHook {
                 return;
             }
             try {
-                launchCustomApp(Intent.parseUri(uri, Intent.URI_INTENT_SCHEME), handler);
+                launchCustomApp(Intent.parseUri(uri, 0), handler);
             } catch (Throwable e) {
                 XpLog.log("launchCustomApp: error parsing uri: " + e, true);
             }
@@ -621,38 +617,39 @@ class ActionManager extends XC_MethodHook {
             } else if (SettingConstant.Ga.ACTION_PREF_HWKEY_CHANGED_CUSTOM.equals(action)) {
                 String value = intent.getStringExtra(Ga.EXTRA_VALUE);
                 XpLog.log("mBroadcastReceiver" + value);
+                int actionId = SettingConstant.HWKEY_ACTION_CUSTOM_ACTIONS;
                 if (SettingConstant.PREF_KEY_HWKEY_BIXBY_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.BIXBY_SINGLETAP, value);
+                    ActionManager.this.setActionFor(HwKeyTrigger.BIXBY_SINGLETAP, actionId, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_BIXBY_LONG_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.BIXBY_LONGPRESS, value);
+                    ActionManager.this.setActionFor(HwKeyTrigger.BIXBY_LONGPRESS, actionId, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_BIXBY_DOUBLE_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.BIXBY_DOUBLETAP, value);
+                    ActionManager.this.setActionFor(HwKeyTrigger.BIXBY_DOUBLETAP, actionId, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_HOME_LONG_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.HOME_LONGPRESS, value);
+                    ActionManager.this.setActionFor(HwKeyTrigger.HOME_LONGPRESS, actionId, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_BACK_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.BACK_SINGLETAP, value);
+                    ActionManager.this.setActionFor(HwKeyTrigger.BACK_SINGLETAP, actionId, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_BACK_LONG_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.BACK_LONGPRESS, value);
+                    ActionManager.this.setActionFor(HwKeyTrigger.BACK_LONGPRESS, actionId, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_BACK_DOUBLE_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.BACK_DOUBLETAP, value);
+                    ActionManager.this.setActionFor(HwKeyTrigger.BACK_DOUBLETAP, actionId, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_MENU_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.MENU_SINGLETAP, value);
+                    ActionManager.this.setActionFor(HwKeyTrigger.MENU_SINGLETAP, actionId, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_MENU_LONG_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.MENU_LONGPRESS, value);
+                    ActionManager.this.setActionFor(HwKeyTrigger.MENU_LONGPRESS, actionId, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_MENU_DOUBLE_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.MENU_DOUBLETAP, value);
+                    ActionManager.this.setActionFor(HwKeyTrigger.MENU_DOUBLETAP, actionId, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_APP_SWITCH_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.APP_SWITCH_SINGLETAP, value);
+                    ActionManager.this.setActionFor(HwKeyTrigger.APP_SWITCH_SINGLETAP, actionId, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_APP_SWITCH_LONG_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.APP_SWITCH_LONGPRESS, value);
+                    ActionManager.this.setActionFor(HwKeyTrigger.APP_SWITCH_LONGPRESS, actionId, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_APP_SWITCH_DOUBLE_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.APP_SWITCH_DOUBLETAP, value);
+                    ActionManager.this.setActionFor(HwKeyTrigger.APP_SWITCH_DOUBLETAP, actionId, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_CUSTOM_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.CUSTOM_SINGLETAP, value);
+                    ActionManager.this.setActionFor(HwKeyTrigger.CUSTOM_SINGLETAP, actionId, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_CUSTOM_LONG_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.CUSTOM_LONGPRESS, value);
+                    ActionManager.this.setActionFor(HwKeyTrigger.CUSTOM_LONGPRESS, actionId, value);
                 } else if (SettingConstant.PREF_KEY_HWKEY_CUSTOM_DOUBLE_CUSTOM.equals(key)) {
-                    ActionManager.this.setActionFor(HwKeyTrigger.CUSTOM_DOUBLETAP, value);
+                    ActionManager.this.setActionFor(HwKeyTrigger.CUSTOM_DOUBLETAP, actionId, value);
                 }
             } else if (SettingConstant.Ga.ACTION_PREF_HWKEY_DOUBLETAP_SPEED_CHANGED.equals(action)) {
                 ActionManager.this.mDoubletapSpeed = intent.getIntExtra(Ga.EXTRA_VALUE, ActionManager.this.mDoubletapSpeed);

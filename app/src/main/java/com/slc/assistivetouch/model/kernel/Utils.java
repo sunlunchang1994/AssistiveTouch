@@ -41,7 +41,6 @@ public class Utils {
         private SystemProp() {
 
         }
-
         // Get the value for the given key
         // @param key: key to lookup
         // @return null if the key isn't found

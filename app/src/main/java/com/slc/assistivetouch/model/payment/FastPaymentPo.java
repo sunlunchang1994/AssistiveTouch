@@ -1,6 +1,8 @@
 package com.slc.assistivetouch.model.payment;
 
-public class FastPaymentPo {
+import java.io.Serializable;
+
+public class FastPaymentPo implements Serializable{
     private int icon;
     private int name;
 

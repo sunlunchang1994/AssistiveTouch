@@ -58,7 +58,6 @@ public class SettingConstant {
     public static final String PREF_KEY_HWKEY_MENU_DOUBLE_CUSTOM = "pref_key_hwkey_menu_double_custom";
     public static final String PREF_KEY_HWKEY_MENU_LONG = "pref_key_hwkey_menu_long";
     public static final String PREF_KEY_HWKEY_MENU_LONG_CUSTOM = "pref_key_hwkey_menu_long_custom";
-    public static final String PREF_KEY_HWKEY_SWITCH_APP_SWITCH_AND_BACK = "pref_key_hwkey_switch_app_switch_and_back";
 
     public static class Ga {
         public static final String ACTION_PREF_HWKEY_CHANGED = "com.slc.assistivetouch.ACTION_PREF_HWKEY_CHANGED";

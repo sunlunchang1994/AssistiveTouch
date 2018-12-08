@@ -3,7 +3,9 @@ package com.slc.assistivetouch.model.load_app.po;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 
-public class PackInfoItemAssist {
+import java.io.Serializable;
+
+public class PackInfoItemAssist implements Serializable{
     private int mAppIconSizePx;
     private PackageManager mPackageManager;
     private Resources mResources;
