@@ -5,7 +5,7 @@ import android.util.Log;
 import de.robv.android.xposed.XposedBridge;
 
 public class XpLog {
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
     private static final String TAG = "AssistiveTouch";
 
     public static void log(String message) {

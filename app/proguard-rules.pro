@@ -153,3 +153,5 @@
 -keep public class com.slc.assistivetouch.model.XposedMain { *; }
 #provider
 -keep class com.slc.code.ui.provider.**{*;}
+#preferences
+-keep class com.slc.assistivetouch.model.load_app.WorldReadablePreferences{*;}

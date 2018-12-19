@@ -481,7 +481,7 @@ class ActionManager extends XC_MethodHook {
      * @param allData
      */
     private void fillPreferences(Map<String, ?> allData) {
-        XpLog.log("fillPreferences", allData.size() + "*", false);
+        XpLog.log("fillPreferences", allData.size() + "*");
         if (allData.size() != 0) {
             this.isLoadPreferences = true;
             setActionFor(HwKeyTrigger.BIXBY_SINGLETAP, Integer.parseInt(getStringByMap(allData, SettingConstant.PREF_KEY_HWKEY_BIXBY, "0")), getStringByMap(allData, SettingConstant.PREF_KEY_HWKEY_BIXBY_CUSTOM));
