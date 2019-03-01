@@ -16,9 +16,6 @@ import android.widget.ProgressBar;
 
 import com.slc.assistivetouch.R;
 import com.slc.assistivetouch.contract.MainSettingContract;
-import com.slc.assistivetouch.contract.MainSettingContract;
-import com.slc.assistivetouch.contract.MainSettingContract;
-import com.slc.assistivetouch.contract.MainSettingContract;
 import com.slc.assistivetouch.model.SettingConstant;
 import com.slc.assistivetouch.model.load_app.MainSettingModelImp;
 import com.slc.assistivetouch.model.load_app.WorldReadablePreferences;
@@ -26,12 +23,9 @@ import com.slc.assistivetouch.model.load_app.po.PackInfoItem;
 import com.slc.assistivetouch.ui.adapter.PackInfoAdapter;
 import com.slc.code.presenter.MvpPresenterImp;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MainSettingPresenterImp extends MvpPresenterImp<MainSettingContract.MainSettingView, MainSettingContract.MainSettingModel> implements MainSettingContract.MainSettingPresenter {
-    private boolean isOxygenOsRomOrH2OsRom;
     private String[] preference_key_activities;
     private SharedPreferences sharedPreferences;
 
@@ -47,8 +41,8 @@ public class MainSettingPresenterImp extends MvpPresenterImp<MainSettingContract
     @Override
     public void init(Bundle bundle) {
         this.preference_key_activities = getContext().getResources().getStringArray(R.array.preference_key_activities);
-        this.isOxygenOsRomOrH2OsRom = bundle.getBoolean(SettingConstant.Ga.KEY_IS_OXYGEN_OS_ROM_OR_H2OS_ROM);
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M || this.isOxygenOsRomOrH2OsRom) {
+        boolean isOxygenOsRomOrH2OsRom = bundle.getBoolean(SettingConstant.Ga.KEY_IS_OXYGEN_OS_ROM_OR_H2OS_ROM);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M || isOxygenOsRomOrH2OsRom) {
             this.sharedPreferences = getContext().getSharedPreferences(SettingConstant.APP_PREFERENCES_NAME, Context.MODE_PRIVATE);
         } else {
             getView().getPreferenceFragment().getPreferenceManager().setStorageDeviceProtected();

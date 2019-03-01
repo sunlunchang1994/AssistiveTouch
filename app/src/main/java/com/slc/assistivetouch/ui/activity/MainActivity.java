@@ -3,6 +3,7 @@ package com.slc.assistivetouch.ui.activity;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.slc.assistivetouch.R;
 import com.slc.assistivetouch.contract.MainContract;
@@ -23,6 +24,9 @@ public class MainActivity extends NativeToolBarActivity<MainContract.MainPresent
     @Override
     protected void initPresenter() {
         super.initPresenter();
+        Log.i("MainActivity",MainActivity.class.getCanonicalName());
+        Log.i("MainActivity",MainActivity.class.getName());
+        Log.i("MainActivity",MainActivity.class.getSimpleName());
         MainPresenterImp.initialize(this);
     }
 

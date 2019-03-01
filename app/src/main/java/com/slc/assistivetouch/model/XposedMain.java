@@ -4,10 +4,14 @@ import android.os.Build;
 
 import com.slc.assistivetouch.model.kernel.AssistiveTouch;
 import com.slc.assistivetouch.model.kernel.HookConstant;
+import com.slc.assistivetouch.model.kernel.PublicDataHelper;
+import com.slc.assistivetouch.model.kernel.ValidationHelper;
+
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
+
 import java.io.File;
 
 public class XposedMain implements IXposedHookZygoteInit, IXposedHookLoadPackage {
@@ -29,7 +33,10 @@ public class XposedMain implements IXposedHookZygoteInit, IXposedHookLoadPackage
     @Override
     public void handleLoadPackage(LoadPackageParam lpparam) throws Throwable {
         if (lpparam.packageName.equals(HookConstant.PACK_ANDROID) && lpparam.processName.equals(HookConstant.PACK_ANDROID)) {
+            PublicDataHelper.initPublicData();
             AssistiveTouch.initAndroid(this.xSharedPreferences, lpparam.classLoader);
+        } else if (lpparam.processName.equals(SettingConstant.PACKAGE_NAME)) {
+            ValidationHelper.initAndroid(lpparam.classLoader);
         }
     }
 }

@@ -155,3 +155,4 @@
 -keep class com.slc.code.ui.provider.**{*;}
 #preferences
 -keep class com.slc.assistivetouch.model.load_app.WorldReadablePreferences{*;}
+-keep class com.slc.assistivetouch.model.SettingConstant { *; }

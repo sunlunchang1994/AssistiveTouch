@@ -79,4 +79,22 @@ public class SettingConstant {
         public static final String KEY_IS_ALLOW_OPEN = "isAllowOpen";
         public static final String KEY_IS_OXYGEN_OS_ROM_OR_H2OS_ROM = "isOxygenOsRomOrH2OsRom";
     }
+
+    /**
+     * 是否加载了模块
+     *
+     * @return
+     */
+    public static Boolean isModuleCheck() {
+        return false;
+    }
+
+    /**
+     * 是否是氢OS或氧OS
+     *
+     * @return
+     */
+    public static Boolean isOxygenOsRomOrH2osRom() {
+        return false;
+    }
 }

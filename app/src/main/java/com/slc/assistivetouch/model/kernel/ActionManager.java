@@ -108,7 +108,7 @@ class ActionManager extends XC_MethodHook {
         map.put(HwKeyTrigger.CUSTOM_LONGPRESS, new HwKeyAction(0, null));
         map.put(HwKeyTrigger.CUSTOM_DOUBLETAP, new HwKeyAction(0, null));
         this.mHwKeyActions = Collections.unmodifiableMap(map);
-        if (!AssistiveTouch.isOxygenOsRomOrH2OsRom()) {
+        if (!PublicDataHelper.isOxygenOsRomOrH2OsRom()) {
             fillPreferences(AssistiveTouch.getXSharedPreferences().getAll());
         }
     }
@@ -121,7 +121,7 @@ class ActionManager extends XC_MethodHook {
      */
     final void initActionReceiver(Context context) {
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Ga.ACTION_REQUEST_SYSTEM_INFO);
+        //intentFilter.addAction(Ga.ACTION_REQUEST_SYSTEM_INFO);
         intentFilter.addAction(Ga.ACTION_PREF_HWKEY_CHANGED);
         intentFilter.addAction(Ga.ACTION_PREF_HWKEY_CHANGED_CUSTOM);
         intentFilter.addAction(Ga.ACTION_PREF_HWKEY_DOUBLETAP_SPEED_CHANGED);
@@ -522,7 +522,7 @@ class ActionManager extends XC_MethodHook {
      * 添加系统是否为OxygenOsRomOrH2OsRom
      */
     private void addOsOxygenOsRomOrH2OsRom() {
-        mBroadcastReceiver.addSendInfo(SettingConstant.Ga.KEY_IS_OXYGEN_OS_ROM_OR_H2OS_ROM, AssistiveTouch.isOxygenOsRomOrH2OsRom());
+        mBroadcastReceiver.addSendInfo(SettingConstant.Ga.KEY_IS_OXYGEN_OS_ROM_OR_H2OS_ROM, PublicDataHelper.isOxygenOsRomOrH2OsRom());
     }
 
     /**
@@ -564,12 +564,13 @@ class ActionManager extends XC_MethodHook {
 
         @Override
         public boolean handlerMsg(Set<String> extraKeySet, Bundle extrasBundle) {
-            for (String extraKey : extraKeySet) {
+            /*for (String extraKey : extraKeySet) {
                 if (Ga.KEY_IS_OXYGEN_OS_ROM_OR_H2OS_ROM.equals(extraKey)) {
                     ActionManager.this.addOsOxygenOsRomOrH2OsRom();
                 }
             }
-            return true;
+            return true;*/
+            return false;
         }
 
         @Override

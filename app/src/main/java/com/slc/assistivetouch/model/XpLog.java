@@ -16,8 +16,8 @@ public class XpLog {
         log(tag, message, DEBUG);
     }
 
-    public static void log(String message, boolean isShow) {
-        log(TAG, message, isShow);
+    public static void log(String message, boolean isDebug) {
+        log(TAG, message, isDebug);
     }
 
     public static void log(String tag, String message, boolean isDebug) {
@@ -38,8 +38,8 @@ public class XpLog {
         log(TAG, t, isShow);
     }
 
-    public static void log(String tag, Throwable t, boolean isShow) {
-        if (isShow) {
+    public static void log(String tag, Throwable t, boolean isDebug) {
+        if (isDebug) {
             XposedBridge.log(tag + ": " + Log.getStackTraceString(t));
         }
     }

@@ -268,8 +268,8 @@ public class MethodHookInterceptKeyBefore {
                     return;
                 }
             }
-            if (AssistiveTouch.isOxygenOsRomOrH2OsRom()) {
                 MethodHookInterceptKeyBefore.this.actionManager.initPreferences();
+            if (PublicDataHelper.isOxygenOsRomOrH2OsRom()) {
             }
             if (MethodHookInterceptKeyBefore.this.actionManager.isIsOpenMainWitch()) {
                 KeyEvent event = (KeyEvent) param.args[0];
